@@ -186,7 +186,7 @@ class _SimulatorState extends State<Simulator> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   FloatingActionButton.extended(
                     label: Text("Clear"),
