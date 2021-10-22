@@ -28,8 +28,8 @@ class Simulator extends StatefulWidget {
 }
 
 class _SimulatorState extends State<Simulator> {
-  static int xdimension = 50; //matrix dimensions
-  static int ydimension = 30;
+  static int xdimension = 15; //matrix dimensions
+  static int ydimension = 15;
 
   var currentMatrix = new List<List<int>>(xdimension);
   var futureMatrix = new List<List<int>>(xdimension);
@@ -42,11 +42,15 @@ class _SimulatorState extends State<Simulator> {
       currentMatrix[i] = List<int>(ydimension);
       futureMatrix[i] = List<int>(ydimension);
       for (int j = 0; j < ydimension; j++) {
-        currentMatrix[i][j] = 0;
-        futureMatrix[i][j] = 0;
+        if (i == j || i == (ydimension - j - 1)) {
+          currentMatrix[i][j] = 1;
+        } else {
+          currentMatrix[i][j] = 0;
+          futureMatrix[i][j] = 0;
+        }
       }
     }
-    Timer.periodic(Duration(milliseconds: 200), (Timer t) {
+    Timer.periodic(Duration(milliseconds: 400), (Timer t) {
       if (player) performNextStep();
     });
   }
@@ -148,7 +152,7 @@ class _SimulatorState extends State<Simulator> {
           //padding: EdgeInsets.all(1),
           child: Icon(
             (currentMatrix[i][j] == 1 ? Icons.add_box : Icons.remove),
-            size: 15,
+            size: 18,
           ),
           onTap: () {
             setState(() {
@@ -165,20 +169,27 @@ class _SimulatorState extends State<Simulator> {
     }
     return Center(
       child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             children: <Widget>[
-              Text("The Amazing \"Game of life simulator\""),
+              Text("The Amazing Game of life simulator",
+                  textAlign: TextAlign.center, style: TextStyle(fontSize: 30)),
+              SizedBox(
+                height: 30,
+              ),
               Container(
                 child: Row(children: matrix, mainAxisSize: MainAxisSize.min),
+              ),
+              SizedBox(
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   FloatingActionButton.extended(
-                    label: Text("reset"),
+                    label: Text("Clear"),
                     onPressed: () {
                       for (int i = 0; i < xdimension; i++) {
                         for (int j = 0; j < ydimension; j++) {
@@ -187,14 +198,21 @@ class _SimulatorState extends State<Simulator> {
                       }
                       setState(() {
                         currentMatrix[0][0] = 0 + 0;
+                        player = false;
                       });
                     },
+                  ),
+                  SizedBox(
+                    width: 20,
                   ),
                   FloatingActionButton.extended(
                     label: Text("Next Step"),
                     onPressed: () {
                       performNextStep();
                     },
+                  ),
+                  SizedBox(
+                    width: 20,
                   ),
                   FloatingActionButton.extended(
                     label: Text(player ? "Stop" : "Start"),
@@ -205,7 +223,46 @@ class _SimulatorState extends State<Simulator> {
                     },
                   )
                 ],
-              )
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              FloatingActionButton.extended(
+                label: Text("Load Example"),
+                onPressed: () {
+                  setState(() {
+                    player = false;
+                    for (int i = 0; i < xdimension; i++) {
+                      for (int j = 0; j < ydimension; j++) {
+                        if (i == j || i == (ydimension - j - 1)) {
+                          currentMatrix[i][j] = 1;
+                        } else {
+                          currentMatrix[i][j] = 0;
+                        }
+                      }
+                    }
+                  });
+                },
+              ),
+              Text(
+                """\nSimple Rules
+
+Any live cell with fewer than two live neighbours dies,
+as if by underpopulation.
+
+Any live cell with two or three live neighbours lives 
+on to the next generation.
+
+Any live cell with more than three live neighbours dies,
+as if by overpopulation.
+
+Any dead cell with exactly three live neighbours becomes a live cell,
+as if by reproduction.
+
+Dead Cell is denoted by ' -- ' and 
+alive cell is denoted by ' + ' """,
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
